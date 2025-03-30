@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speed Typing Test</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .font-mono {
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="min-h-screen bg-gray-100 py-8 px-4">
+    <div class="max-w-3xl mx-auto">
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-center mb-8">Speed Typing Test</h1>
+        
+        <!-- Difficulty Selection and Controls -->
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex gap-4">
+            <button
+              id="easy-btn"
+              class="px-4 py-2 rounded-md capitalize bg-blue-600 text-white"
+            >
+              easy
+            </button>
+            <button
+              id="medium-btn"
+              class="px-4 py-2 rounded-md capitalize bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              medium
+            </button>
+            <button
+              id="hard-btn"
+              class="px-4 py-2 rounded-md capitalize bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              hard
+            </button>
+          </div>
+          <div class="flex gap-4">
+            <button
+              id="history-btn"
+              class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+            >
+              <i data-lucide="history" class="w-5 h-5"></i>
+              History
+            </button>
+            <button
+              id="custom-text-btn"
+              class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+            >
+              <i data-lucide="edit-3" class="w-5 h-5"></i>
+              Custom Text
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Text Input -->
+        <div id="custom-text-container" class="mb-6 hidden">
+          <textarea
+            id="custom-text"
+            class="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="2"
+            placeholder="Enter your custom text here..."
+          ></textarea>
+          <button
+            id="use-custom-text-btn"
+            class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Use Custom Text
+          </button>
+        </div>
+
+        <!-- Stats Display -->
+        <div class="grid grid-cols-6 gap-4 mb-6">
+          <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <i data-lucide="timer" class="w-6 h-6 mx-auto mb-2"></i>
+            <div class="text-sm text-gray-600">WPM</div>
+            <div id="wpm" class="text-xl font-bold">0</div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <i data-lucide="target" class="w-6 h-6 mx-auto mb-2"></i>
+            <div class="text-sm text-gray-600">Accuracy</div>
+            <div id="accuracy" class="text-xl font-bold">100%</div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <i data-lucide="award" class="w-6 h-6 mx-auto mb-2"></i>
+            <div class="text-sm text-gray-600">Best</div>
+            <div id="best-score" class="text-xl font-bold">0</div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <i data-lucide="trending-up" class="w-6 h-6 mx-auto mb-2"></i>
+            <div class="text-sm text-gray-600">Mistakes</div>
+            <div id="mistakes" class="text-xl font-bold">0</div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <i data-lucide="clock" class="w-6 h-6 mx-auto mb-2"></i>
+            <div class="text-sm text-gray-600">Time</div>
+            <div id="current-time" class="text-xl font-bold">0s</div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <i data-lucide="chevron-down" class="w-6 h-6 mx-auto mb-2"></i>
+            <div class="text-sm text-gray-600">Live WPM</div>
+            <div id="instant-wpm" class="text-xl font-bold">0</div>
+          </div>
+        </div>
+
+        <!-- History Panel -->
+        <div id="history-container" class="mb-6 bg-gray-50 p-4 rounded-lg hidden">
+          <h2 class="text-xl font-bold mb-4">Recent Attempts</h2>
+          <div id="history-entries" class="space-y-2">
+            <p class="text-gray-500 text-center">No attempts yet</p>
+          </div>
+        </div>
+
+        <!-- Countdown Display -->
+        <div id="countdown-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+          <div id="countdown" class="text-6xl text-white font-bold">
+            5
+          </div>
+        </div>
+
+        <!-- Text Display -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+          <p id="text-display" class="text-lg font-mono">
+            <!-- Text will be inserted here by JavaScript -->
+          </p>
+        </div>
+
+        <!-- Input Area -->
+        <div class="mb-6">
+          <textarea
+            id="user-input"
+            class="w-full p-4 border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="3"
+            placeholder="Start typing here..."
+          ></textarea>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex justify-center">
+          <button
+            id="reset-btn"
+            class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+            Try Again
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample texts of varying difficulty
+    const texts = {
+      easy: [
+        "The quick brown fox jumps over the lazy dog.",
+        "A journey of a thousand miles begins with a single step.",
+        "All that glitters is not gold.",
+      ],
+      medium: [
+        "Programming is the art of telling another human what one wants the computer to do.",
+        "The best way to predict the future is to implement it.",
+        "In theory, theory and practice are the same. In practice, they're different.",
+      ],
+      hard: [
+        "The programmer, like the poet, works only slightly removed from pure thought-stuff.",
+        "Debugging is twice as hard as writing the code in the first place.",
+        "The function of good software is to make the complex appear to be simple.",
+      ]
+    };
+
+    // State variables
+    let state = {
+      difficulty: 'easy',
+      currentText: '',
+      userInput: '',
+      startTime: null,
+      endTime: null,
+      wpm: 0,
+      accuracy: 100,
+      isFinished: false,
+      mistakes: 0,
+      bestScore: 0,
+      history: [],
+      showHistory: false,
+      countDown: 5,
+      isCountingDown: false,
+      showCustomInput: false,
+      customText: '',
+      currentTime: 0,
+      instantWpm: 0,
+      timerInterval: null,
+      countdownTimeout: null
+    };
+
+    // DOM elements
+    const elements = {
+      easyBtn: document.getElementById('easy-btn'),
+      mediumBtn: document.getElementById('medium-btn'),
+      hardBtn: document.getElementById('hard-btn'),
+      historyBtn: document.getElementById('history-btn'),
+      customTextBtn: document.getElementById('custom-text-btn'),
+      customTextContainer: document.getElementById('custom-text-container'),
+      customText: document.getElementById('custom-text'),
+      useCustomTextBtn: document.getElementById('use-custom-text-btn'),
+      wpmDisplay: document.getElementById('wpm'),
+      accuracyDisplay: document.getElementById('accuracy'),
+      bestScoreDisplay: document.getElementById('best-score'),
+      mistakesDisplay: document.getElementById('mistakes'),
+      currentTimeDisplay: document.getElementById('current-time'),
+      instantWpmDisplay: document.getElementById('instant-wpm'),
+      historyContainer: document.getElementById('history-container'),
+      historyEntries: document.getElementById('history-entries'),
+      countdownOverlay: document.getElementById('countdown-overlay'),
+      countdownDisplay: document.getElementById('countdown'),
+      textDisplay: document.getElementById('text-display'),
+      userInput: document.getElementById('user-input'),
+      resetBtn: document.getElementById('reset-btn')
+    };
+
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Helper functions
+    function getNewText() {
+      const textArray = texts[state.difficulty];
+      const randomIndex = Math.floor(Math.random() * textArray.length);
+      return textArray[randomIndex];
+    }
+
+    function resetGame() {
+      state.currentText = state.showCustomInput && state.customText ? state.customText : getNewText();
+      state.userInput = '';
+      state.startTime = null;
+      state.endTime = null;
+      state.wpm = 0;
+      state.accuracy = 100;
+      state.isFinished = false;
+      state.mistakes = 0;
+      state.currentTime = 0;
+      state.instantWpm = 0;
+      state.isCountingDown = true;
+      state.countDown = 5;
+
+      // Clear any existing intervals/timeouts
+      if (state.timerInterval) clearInterval(state.timerInterval);
+      if (state.countdownTimeout) clearTimeout(state.countdownTimeout);
+
+      // Update UI
+      updateUI();
+      startCountdown();
+    }
+
+    function startCountdown() {
+      elements.countdownOverlay.classList.remove('hidden');
+      elements.countdownDisplay.textContent = state.countDown;
+      elements.userInput.placeholder = "Get ready...";
+      elements.userInput.disabled = true;
+
+      state.countdownTimeout = setInterval(() => {
+        state.countDown--;
+        elements.countdownDisplay.textContent = state.countDown;
+
+        if (state.countDown <= 0) {
+          clearInterval(state.countdownTimeout);
+          state.isCountingDown = false;
+          elements.countdownOverlay.classList.add('hidden');
+          elements.userInput.placeholder = "Start typing here...";
+          elements.userInput.disabled = false;
+          elements.userInput.focus();
+        }
+      }, 1000);
+    }
+
+    function updateUI() {
+      // Update text display with colored characters
+      elements.textDisplay.innerHTML = '';
+      for (let i = 0; i < state.currentText.length; i++) {
+        const span = document.createElement('span');
+        let color = 'text-gray-400';
+        if (i < state.userInput.length) {
+          color = state.userInput[i] === state.currentText[i] ? 'text-green-600' : 'text-red-600';
+        }
+        span.className = color;
+        span.textContent = state.currentText[i];
+        elements.textDisplay.appendChild(span);
+      }
+
+      // Update stats
+      elements.wpmDisplay.textContent = state.wpm;
+      elements.accuracyDisplay.textContent = state.accuracy + '%';
+      elements.bestScoreDisplay.textContent = state.bestScore;
+      elements.mistakesDisplay.textContent = state.mistakes;
+      elements.currentTimeDisplay.textContent = state.currentTime + 's';
+      elements.instantWpmDisplay.textContent = state.instantWpm;
+      elements.userInput.value = state.userInput;
+
+      // Update difficulty buttons
+      elements.easyBtn.className = `px-4 py-2 rounded-md capitalize ${state.difficulty === 'easy' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`;
+      elements.mediumBtn.className = `px-4 py-2 rounded-md capitalize ${state.difficulty === 'medium' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`;
+      elements.hardBtn.className = `px-4 py-2 rounded-md capitalize ${state.difficulty === 'hard' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`;
+
+      // Update history display
+      if (state.showHistory) {
+        elements.historyContainer.classList.remove('hidden');
+        if (state.history.length > 0) {
+          elements.historyEntries.innerHTML = '';
+          state.history.forEach(entry => {
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'flex justify-between items-center p-2 bg-white rounded-md';
+            entryDiv.innerHTML = `
+              <span class="text-gray-600">${entry.date.toLocaleDateString()} ${entry.date.toLocaleTimeString()}</span>
+              <span class="capitalize text-gray-600">${entry.difficulty}</span>
+              <span class="font-medium">${entry.wpm} WPM</span>
+              <span class="font-medium">${entry.accuracy}% Accuracy</span>
+            `;
+            elements.historyEntries.appendChild(entryDiv);
+          });
+        } else {
+          elements.historyEntries.innerHTML = '<p class="text-gray-500 text-center">No attempts yet</p>';
+        }
+      } else {
+        elements.historyContainer.classList.add('hidden');
+      }
+    }
+
+    // Event listeners
+    elements.easyBtn.addEventListener('click', () => {
+      state.difficulty = 'easy';
+      resetGame();
+    });
+
+    elements.mediumBtn.addEventListener('click', () => {
+      state.difficulty = 'medium';
+      resetGame();
+    });
+
+    elements.hardBtn.addEventListener('click', () => {
+      state.difficulty = 'hard';
+      resetGame();
+    });
+
+    elements.historyBtn.addEventListener('click', () => {
+      state.showHistory = !state.showHistory;
+      updateUI();
+    });
+
+    elements.customTextBtn.addEventListener('click', () => {
+      state.showCustomInput = !state.showCustomInput;
+      if (state.showCustomInput) {
+        elements.customTextContainer.classList.remove('hidden');
+      } else {
+        elements.customTextContainer.classList.add('hidden');
+      }
+    });
+
+    elements.useCustomTextBtn.addEventListener('click', () => {
+      if (elements.customText.value.trim()) {
+        state.customText = elements.customText.value.trim();
+        resetGame();
+      }
+    });
+
+    elements.userInput.addEventListener('input', (e) => {
+      if (state.isCountingDown) return;
+      
+      state.userInput = e.target.value;
+
+      // Start timer on first input
+      if (!state.startTime && state.userInput.length === 1) {
+        state.startTime = Date.now();
+        
+        // Start timer for current time and instant WPM
+        state.timerInterval = setInterval(() => {
+          const elapsed = Date.now() - state.startTime;
+          state.currentTime = Math.floor(elapsed / 1000);
+          
+          // Calculate instant WPM
+          const wordsTyped = state.userInput.trim().split(' ').length;
+          const minutesElapsed = elapsed / 60000;
+          state.instantWpm = Math.round(wordsTyped / minutesElapsed);
+          
+          updateUI();
+        }, 1000);
+      }
+
+      // Calculate mistakes
+      let mistakeCount = 0;
+      for (let i = 0; i < state.userInput.length; i++) {
+        if (state.userInput[i] !== state.currentText[i]) {
+          mistakeCount++;
+        }
+      }
+      state.mistakes = mistakeCount;
+
+      // Check if completed
+      if (state.userInput.length === state.currentText.length) {
+        const endTimeNow = Date.now();
+        state.endTime = endTimeNow;
+        state.isFinished = true;
+        
+        // Calculate final stats
+        const timeInMinutes = (endTimeNow - (state.startTime || endTimeNow)) / 60000;
+        const wordsTyped = state.currentText.split(' ').length;
+        const currentWpm = Math.round(wordsTyped / timeInMinutes);
+        const currentAccuracy = Math.round(((state.currentText.length - mistakeCount) / state.currentText.length) * 100);
+        
+        state.wpm = currentWpm;
+        state.accuracy = currentAccuracy;
+        
+        // Update best score
+        if (currentWpm > state.bestScore) {
+          state.bestScore = currentWpm;
+        }
+
+        // Add to history
+        state.history = [{
+          date: new Date(),
+          wpm: currentWpm,
+          accuracy: currentAccuracy,
+          difficulty: state.difficulty
+        }, ...state.history].slice(0, 10);
+
+        // Clear timer
+        clearInterval(state.timerInterval);
+      }
+
+      updateUI();
+    });
+
+    elements.resetBtn.addEventListener('click', resetGame);
+
+    // Initialize the game
+    resetGame();
+  </script>
+</body>
+</html>
