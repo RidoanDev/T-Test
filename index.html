@@ -30,6 +30,14 @@
       <div class="bg-white rounded-lg shadow-lg p-4 sm:p-8">
         <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6">Speed Typing Test</h1>
         
+        <!-- Offline Status Indicator -->
+        <div id="offline-status" class="hidden fixed top-4 right-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 rounded shadow-md z-50" role="alert">
+          <div class="flex items-center">
+            <i data-lucide="wifi-off" class="w-5 h-5 mr-2"></i>
+            <span class="text-sm font-medium">You are offline</span>
+          </div>
+        </div>
+        
         <!-- Difficulty Selection and Controls -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div class="flex flex-wrap gap-2">
@@ -277,7 +285,8 @@
       countdownTimeout: null,
       isPaused: false,
       pauseStartTime: null,
-      totalPauseTime: 0
+      totalPauseTime: 0,
+      isOnline: navigator.onLine
     };
 
     // DOM elements
@@ -312,7 +321,8 @@
       textDisplay: document.getElementById('text-display'),
       userInput: document.getElementById('user-input'),
       resetBtn: document.getElementById('reset-btn'),
-      pauseBtn: document.getElementById('pause-btn')
+      pauseBtn: document.getElementById('pause-btn'),
+      offlineStatus: document.getElementById('offline-status')
     };
 
     // Initialize Lucide icons
@@ -487,6 +497,13 @@
         elements.userInput.placeholder = state.isFinished ? "Test completed!" : "Start typing here...";
       }
       
+      // Update offline status
+      if (!state.isOnline) {
+        elements.offlineStatus.classList.remove('hidden');
+      } else {
+        elements.offlineStatus.classList.add('hidden');
+      }
+      
       // Refresh Lucide icons
       lucide.createIcons();
     }
@@ -523,6 +540,25 @@
       state.history = [];
       saveHistory();
       updateUI();
+    }
+
+    // Network status detection
+    function updateOnlineStatus() {
+      state.isOnline = navigator.onLine;
+      updateUI();
+    }
+
+    // Service Worker Registration
+    function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }).catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
     }
 
     // Event listeners
@@ -661,8 +697,27 @@
       }
     });
 
+    // Network status events
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
     // Initialize the game
+    registerServiceWorker();
+    updateOnlineStatus();
     resetGame();
+  </script>
+
+  <!-- Service Worker Script -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      const swUrl = new URL('sw.js', window.location.href).href;
+      
+      navigator.serviceWorker.register(swUrl).then(registration => {
+        console.log('Service Worker registered with scope:', registration.scope);
+      }).catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+    }
   </script>
 </body>
 </html>
