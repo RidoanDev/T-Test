@@ -10,144 +10,210 @@
     .font-mono {
       font-family: monospace;
     }
+    @media (max-width: 640px) {
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    .cursor-blink {
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { opacity: 1; }
+      50% { opacity: 0; }
+    }
   </style>
 </head>
-<body>
-  <div id="app" class="min-h-screen bg-gray-100 py-8 px-4">
+<body class="bg-gray-100">
+  <div id="app" class="min-h-screen py-4 px-2 sm:py-8 sm:px-4">
     <div class="max-w-3xl mx-auto">
-      <div class="bg-white rounded-lg shadow-lg p-8">
-        <h1 class="text-3xl font-bold text-center mb-8">Speed Typing Test</h1>
+      <div class="bg-white rounded-lg shadow-lg p-4 sm:p-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6">Speed Typing Test</h1>
         
         <!-- Difficulty Selection and Controls -->
-        <div class="flex justify-between items-center mb-6">
-          <div class="flex gap-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div class="flex flex-wrap gap-2">
             <button
               id="easy-btn"
-              class="px-4 py-2 rounded-md capitalize bg-blue-600 text-white"
+              class="px-3 py-1 sm:px-4 sm:py-2 rounded-md capitalize bg-blue-600 text-white text-sm sm:text-base"
             >
-              easy
+              Easy
             </button>
             <button
               id="medium-btn"
-              class="px-4 py-2 rounded-md capitalize bg-gray-200 text-gray-700 hover:bg-gray-300"
+              class="px-3 py-1 sm:px-4 sm:py-2 rounded-md capitalize bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm sm:text-base"
             >
-              medium
+              Medium
             </button>
             <button
               id="hard-btn"
-              class="px-4 py-2 rounded-md capitalize bg-gray-200 text-gray-700 hover:bg-gray-300"
+              class="px-3 py-1 sm:px-4 sm:py-2 rounded-md capitalize bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm sm:text-base"
             >
-              hard
+              Hard
             </button>
           </div>
-          <div class="flex gap-4">
+          <div class="flex flex-wrap gap-2 w-full sm:w-auto">
             <button
               id="history-btn"
-              class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+              class="flex items-center gap-1 px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm sm:text-base"
             >
-              <i data-lucide="history" class="w-5 h-5"></i>
-              History
+              <i data-lucide="history" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+              <span>History</span>
             </button>
             <button
               id="custom-text-btn"
-              class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+              class="flex items-center gap-1 px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm sm:text-base"
             >
-              <i data-lucide="edit-3" class="w-5 h-5"></i>
-              Custom Text
+              <i data-lucide="edit-3" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+              <span>Custom Text</span>
             </button>
           </div>
         </div>
 
         <!-- Custom Text Input -->
-        <div id="custom-text-container" class="mb-6 hidden">
+        <div id="custom-text-container" class="mb-6 hidden transition-all duration-300">
           <textarea
             id="custom-text"
-            class="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="2"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+            rows="3"
             placeholder="Enter your custom text here..."
           ></textarea>
-          <button
-            id="use-custom-text-btn"
-            class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Use Custom Text
-          </button>
+          <div class="flex gap-2 mt-2">
+            <button
+              id="use-custom-text-btn"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm sm:text-base"
+            >
+              Use Custom Text
+            </button>
+            <button
+              id="cancel-custom-text-btn"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm sm:text-base"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
 
         <!-- Stats Display -->
-        <div class="grid grid-cols-6 gap-4 mb-6">
-          <div class="bg-gray-50 p-4 rounded-lg text-center">
-            <i data-lucide="timer" class="w-6 h-6 mx-auto mb-2"></i>
-            <div class="text-sm text-gray-600">WPM</div>
-            <div id="wpm" class="text-xl font-bold">0</div>
+        <div class="stats-grid grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-4 mb-6">
+          <div class="bg-gray-50 p-2 sm:p-4 rounded-lg text-center">
+            <i data-lucide="timer" class="w-5 h-5 mx-auto mb-1 sm:mb-2"></i>
+            <div class="text-xs sm:text-sm text-gray-600">WPM</div>
+            <div id="wpm" class="text-lg sm:text-xl font-bold">0</div>
           </div>
-          <div class="bg-gray-50 p-4 rounded-lg text-center">
-            <i data-lucide="target" class="w-6 h-6 mx-auto mb-2"></i>
-            <div class="text-sm text-gray-600">Accuracy</div>
-            <div id="accuracy" class="text-xl font-bold">100%</div>
+          <div class="bg-gray-50 p-2 sm:p-4 rounded-lg text-center">
+            <i data-lucide="target" class="w-5 h-5 mx-auto mb-1 sm:mb-2"></i>
+            <div class="text-xs sm:text-sm text-gray-600">Accuracy</div>
+            <div id="accuracy" class="text-lg sm:text-xl font-bold">100%</div>
           </div>
-          <div class="bg-gray-50 p-4 rounded-lg text-center">
-            <i data-lucide="award" class="w-6 h-6 mx-auto mb-2"></i>
-            <div class="text-sm text-gray-600">Best</div>
-            <div id="best-score" class="text-xl font-bold">0</div>
+          <div class="bg-gray-50 p-2 sm:p-4 rounded-lg text-center">
+            <i data-lucide="award" class="w-5 h-5 mx-auto mb-1 sm:mb-2"></i>
+            <div class="text-xs sm:text-sm text-gray-600">Best</div>
+            <div id="best-score" class="text-lg sm:text-xl font-bold">0</div>
           </div>
-          <div class="bg-gray-50 p-4 rounded-lg text-center">
-            <i data-lucide="trending-up" class="w-6 h-6 mx-auto mb-2"></i>
-            <div class="text-sm text-gray-600">Mistakes</div>
-            <div id="mistakes" class="text-xl font-bold">0</div>
+          <div class="bg-gray-50 p-2 sm:p-4 rounded-lg text-center hidden sm:block">
+            <i data-lucide="trending-up" class="w-5 h-5 mx-auto mb-1 sm:mb-2"></i>
+            <div class="text-xs sm:text-sm text-gray-600">Mistakes</div>
+            <div id="mistakes" class="text-lg sm:text-xl font-bold">0</div>
           </div>
-          <div class="bg-gray-50 p-4 rounded-lg text-center">
-            <i data-lucide="clock" class="w-6 h-6 mx-auto mb-2"></i>
-            <div class="text-sm text-gray-600">Time</div>
-            <div id="current-time" class="text-xl font-bold">0s</div>
+          <div class="bg-gray-50 p-2 sm:p-4 rounded-lg text-center hidden sm:block">
+            <i data-lucide="clock" class="w-5 h-5 mx-auto mb-1 sm:mb-2"></i>
+            <div class="text-xs sm:text-sm text-gray-600">Time</div>
+            <div id="current-time" class="text-lg sm:text-xl font-bold">0s</div>
           </div>
-          <div class="bg-gray-50 p-4 rounded-lg text-center">
-            <i data-lucide="chevron-down" class="w-6 h-6 mx-auto mb-2"></i>
-            <div class="text-sm text-gray-600">Live WPM</div>
-            <div id="instant-wpm" class="text-xl font-bold">0</div>
+          <div class="bg-gray-50 p-2 sm:p-4 rounded-lg text-center hidden sm:block">
+            <i data-lucide="chevron-down" class="w-5 h-5 mx-auto mb-1 sm:mb-2"></i>
+            <div class="text-xs sm:text-sm text-gray-600">Live WPM</div>
+            <div id="instant-wpm" class="text-lg sm:text-xl font-bold">0</div>
+          </div>
+        </div>
+
+        <!-- Mobile Stats Summary -->
+        <div id="mobile-stats" class="bg-gray-50 p-3 rounded-lg mb-4 sm:hidden">
+          <div class="flex justify-between">
+            <div class="text-sm">
+              <span class="font-medium">WPM:</span> <span id="mobile-wpm">0</span>
+            </div>
+            <div class="text-sm">
+              <span class="font-medium">Accuracy:</span> <span id="mobile-accuracy">100%</span>
+            </div>
+            <div class="text-sm">
+              <span class="font-medium">Mistakes:</span> <span id="mobile-mistakes">0</span>
+            </div>
           </div>
         </div>
 
         <!-- History Panel -->
         <div id="history-container" class="mb-6 bg-gray-50 p-4 rounded-lg hidden">
-          <h2 class="text-xl font-bold mb-4">Recent Attempts</h2>
-          <div id="history-entries" class="space-y-2">
-            <p class="text-gray-500 text-center">No attempts yet</p>
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-lg sm:text-xl font-bold">Recent Attempts</h2>
+            <button id="clear-history-btn" class="text-sm text-red-600 hover:text-red-800">
+              Clear History
+            </button>
+          </div>
+          <div id="history-entries" class="space-y-2 max-h-60 overflow-y-auto">
+            <p class="text-gray-500 text-center py-4">No attempts yet</p>
           </div>
         </div>
 
         <!-- Countdown Display -->
-        <div id="countdown-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-          <div id="countdown" class="text-6xl text-white font-bold">
+        <div id="countdown-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+          <div id="countdown" class="text-4xl sm:text-6xl text-white font-bold">
             5
           </div>
         </div>
 
+        <!-- Completion Modal -->
+        <div id="completion-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+          <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+            <div class="text-center mb-4">
+              <i data-lucide="award" class="w-12 h-12 text-yellow-500 mx-auto mb-3"></i>
+              <h2 class="text-xl font-bold mb-2">Test Completed!</h2>
+              <div class="text-lg" id="completion-wpm">WPM: 0</div>
+              <div class="text-lg" id="completion-accuracy">Accuracy: 100%</div>
+            </div>
+            <button id="close-completion-modal" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              Continue
+            </button>
+          </div>
+        </div>
+
         <!-- Text Display -->
-        <div class="bg-gray-50 p-4 rounded-lg mb-6">
-          <p id="text-display" class="text-lg font-mono">
+        <div class="bg-gray-50 p-4 rounded-lg mb-4 sm:mb-6">
+          <p id="text-display" class="text-base sm:text-lg font-mono leading-relaxed">
             <!-- Text will be inserted here by JavaScript -->
           </p>
         </div>
 
         <!-- Input Area -->
-        <div class="mb-6">
+        <div class="mb-4 sm:mb-6">
           <textarea
             id="user-input"
-            class="w-full p-4 border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="3"
+            class="w-full p-3 border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+            rows="4"
             placeholder="Start typing here..."
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
           ></textarea>
         </div>
 
         <!-- Controls -->
-        <div class="flex justify-center">
+        <div class="flex justify-center gap-4">
           <button
             id="reset-btn"
-            class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            class="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
           >
-            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+            <i data-lucide="refresh-cw" class="w-4 h-4 sm:w-5 sm:h-5"></i>
             Try Again
+          </button>
+          <button
+            id="pause-btn"
+            class="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base hidden"
+          >
+            <i data-lucide="pause" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+            Pause
           </button>
         </div>
       </div>
@@ -155,22 +221,35 @@
   </div>
 
   <script>
-    // Sample texts of varying difficulty
+    // Enhanced sample texts of varying difficulty
     const texts = {
       easy: [
         "The quick brown fox jumps over the lazy dog.",
         "A journey of a thousand miles begins with a single step.",
         "All that glitters is not gold.",
+        "Practice makes perfect.",
+        "The early bird catches the worm.",
+        "Actions speak louder than words.",
+        "Better late than never.",
+        "Don't count your chickens before they hatch."
       ],
       medium: [
         "Programming is the art of telling another human what one wants the computer to do.",
         "The best way to predict the future is to implement it.",
         "In theory, theory and practice are the same. In practice, they're different.",
+        "The only way to learn a new programming language is by writing programs in it.",
+        "Debugging is twice as hard as writing the code in the first place.",
+        "Measuring programming progress by lines of code is like measuring aircraft building progress by weight.",
+        "The most disastrous thing that you can ever learn is your first programming language."
       ],
       hard: [
         "The programmer, like the poet, works only slightly removed from pure thought-stuff.",
-        "Debugging is twice as hard as writing the code in the first place.",
         "The function of good software is to make the complex appear to be simple.",
+        "There are two ways to write error-free programs; only the third one works.",
+        "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
+        "First, solve the problem. Then, write the code.",
+        "Sometimes it pays to stay in bed on Monday, rather than spending the rest of the week debugging Monday's code.",
+        "Walking on water and developing software from a specification are easy if both are frozen."
       ]
     };
 
@@ -186,7 +265,7 @@
       isFinished: false,
       mistakes: 0,
       bestScore: 0,
-      history: [],
+      history: JSON.parse(localStorage.getItem('typingHistory')) || [],
       showHistory: false,
       countDown: 5,
       isCountingDown: false,
@@ -195,7 +274,10 @@
       currentTime: 0,
       instantWpm: 0,
       timerInterval: null,
-      countdownTimeout: null
+      countdownTimeout: null,
+      isPaused: false,
+      pauseStartTime: null,
+      totalPauseTime: 0
     };
 
     // DOM elements
@@ -208,19 +290,29 @@
       customTextContainer: document.getElementById('custom-text-container'),
       customText: document.getElementById('custom-text'),
       useCustomTextBtn: document.getElementById('use-custom-text-btn'),
+      cancelCustomTextBtn: document.getElementById('cancel-custom-text-btn'),
       wpmDisplay: document.getElementById('wpm'),
       accuracyDisplay: document.getElementById('accuracy'),
       bestScoreDisplay: document.getElementById('best-score'),
       mistakesDisplay: document.getElementById('mistakes'),
       currentTimeDisplay: document.getElementById('current-time'),
       instantWpmDisplay: document.getElementById('instant-wpm'),
+      mobileWpm: document.getElementById('mobile-wpm'),
+      mobileAccuracy: document.getElementById('mobile-accuracy'),
+      mobileMistakes: document.getElementById('mobile-mistakes'),
       historyContainer: document.getElementById('history-container'),
       historyEntries: document.getElementById('history-entries'),
+      clearHistoryBtn: document.getElementById('clear-history-btn'),
       countdownOverlay: document.getElementById('countdown-overlay'),
       countdownDisplay: document.getElementById('countdown'),
+      completionModal: document.getElementById('completion-modal'),
+      closeCompletionModal: document.getElementById('close-completion-modal'),
+      completionWpm: document.getElementById('completion-wpm'),
+      completionAccuracy: document.getElementById('completion-accuracy'),
       textDisplay: document.getElementById('text-display'),
       userInput: document.getElementById('user-input'),
-      resetBtn: document.getElementById('reset-btn')
+      resetBtn: document.getElementById('reset-btn'),
+      pauseBtn: document.getElementById('pause-btn')
     };
 
     // Initialize Lucide icons
@@ -228,13 +320,16 @@
 
     // Helper functions
     function getNewText() {
+      if (state.showCustomInput && state.customText) {
+        return state.customText;
+      }
       const textArray = texts[state.difficulty];
       const randomIndex = Math.floor(Math.random() * textArray.length);
       return textArray[randomIndex];
     }
 
     function resetGame() {
-      state.currentText = state.showCustomInput && state.customText ? state.customText : getNewText();
+      state.currentText = getNewText();
       state.userInput = '';
       state.startTime = null;
       state.endTime = null;
@@ -246,10 +341,13 @@
       state.instantWpm = 0;
       state.isCountingDown = true;
       state.countDown = 5;
+      state.isPaused = false;
+      state.totalPauseTime = 0;
+      state.pauseStartTime = null;
 
       // Clear any existing intervals/timeouts
       if (state.timerInterval) clearInterval(state.timerInterval);
-      if (state.countdownTimeout) clearTimeout(state.countdownTimeout);
+      if (state.countdownTimeout) clearInterval(state.countdownTimeout);
 
       // Update UI
       updateUI();
@@ -261,6 +359,7 @@
       elements.countdownDisplay.textContent = state.countDown;
       elements.userInput.placeholder = "Get ready...";
       elements.userInput.disabled = true;
+      elements.pauseBtn.classList.add('hidden');
 
       state.countdownTimeout = setInterval(() => {
         state.countDown--;
@@ -273,20 +372,60 @@
           elements.userInput.placeholder = "Start typing here...";
           elements.userInput.disabled = false;
           elements.userInput.focus();
+          elements.pauseBtn.classList.remove('hidden');
         }
       }, 1000);
+    }
+
+    function calculateStats() {
+      const now = Date.now();
+      const elapsed = state.startTime ? (now - state.startTime - state.totalPauseTime) : 0;
+      const minutesElapsed = elapsed / 60000;
+      
+      // Calculate accuracy
+      let correctChars = 0;
+      for (let i = 0; i < state.userInput.length; i++) {
+        if (state.userInput[i] === state.currentText[i]) {
+          correctChars++;
+        }
+      }
+      
+      // Calculate mistakes
+      state.mistakes = state.userInput.length - correctChars;
+      
+      // Calculate WPM (5 characters = 1 word)
+      const wordsTyped = correctChars / 5;
+      state.instantWpm = minutesElapsed > 0 ? Math.round(wordsTyped / minutesElapsed) : 0;
+      
+      // Update accuracy
+      state.accuracy = state.userInput.length > 0 ? Math.round((correctChars / state.userInput.length) * 100) : 100;
+      
+      // Update current time
+      state.currentTime = Math.floor(elapsed / 1000);
+      
+      return { elapsed, minutesElapsed, correctChars };
     }
 
     function updateUI() {
       // Update text display with colored characters
       elements.textDisplay.innerHTML = '';
+      let cursorPosition = state.userInput.length;
+      
       for (let i = 0; i < state.currentText.length; i++) {
         const span = document.createElement('span');
         let color = 'text-gray-400';
+        
         if (i < state.userInput.length) {
           color = state.userInput[i] === state.currentText[i] ? 'text-green-600' : 'text-red-600';
         }
-        span.className = color;
+        
+        // Add underline to current position
+        if (i === cursorPosition && !state.isFinished && !state.isCountingDown && !state.isPaused) {
+          span.className = `${color} underline cursor-blink`;
+        } else {
+          span.className = color;
+        }
+        
         span.textContent = state.currentText[i];
         elements.textDisplay.appendChild(span);
       }
@@ -299,49 +438,112 @@
       elements.currentTimeDisplay.textContent = state.currentTime + 's';
       elements.instantWpmDisplay.textContent = state.instantWpm;
       elements.userInput.value = state.userInput;
+      
+      // Update mobile stats
+      elements.mobileWpm.textContent = state.wpm;
+      elements.mobileAccuracy.textContent = state.accuracy + '%';
+      elements.mobileMistakes.textContent = state.mistakes;
 
       // Update difficulty buttons
-      elements.easyBtn.className = `px-4 py-2 rounded-md capitalize ${state.difficulty === 'easy' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`;
-      elements.mediumBtn.className = `px-4 py-2 rounded-md capitalize ${state.difficulty === 'medium' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`;
-      elements.hardBtn.className = `px-4 py-2 rounded-md capitalize ${state.difficulty === 'hard' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`;
+      elements.easyBtn.className = `px-3 py-1 sm:px-4 sm:py-2 rounded-md capitalize ${state.difficulty === 'easy' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'} text-sm sm:text-base`;
+      elements.mediumBtn.className = `px-3 py-1 sm:px-4 sm:py-2 rounded-md capitalize ${state.difficulty === 'medium' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'} text-sm sm:text-base`;
+      elements.hardBtn.className = `px-3 py-1 sm:px-4 sm:py-2 rounded-md capitalize ${state.difficulty === 'hard' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'} text-sm sm:text-base`;
 
       // Update history display
       if (state.showHistory) {
         elements.historyContainer.classList.remove('hidden');
         if (state.history.length > 0) {
           elements.historyEntries.innerHTML = '';
-          state.history.forEach(entry => {
+          state.history.forEach((entry, index) => {
             const entryDiv = document.createElement('div');
-            entryDiv.className = 'flex justify-between items-center p-2 bg-white rounded-md';
+            entryDiv.className = 'flex flex-col sm:flex-row sm:justify-between sm:items-center p-2 bg-white rounded-md text-sm';
             entryDiv.innerHTML = `
-              <span class="text-gray-600">${entry.date.toLocaleDateString()} ${entry.date.toLocaleTimeString()}</span>
-              <span class="capitalize text-gray-600">${entry.difficulty}</span>
-              <span class="font-medium">${entry.wpm} WPM</span>
-              <span class="font-medium">${entry.accuracy}% Accuracy</span>
+              <div class="flex justify-between sm:block">
+                <span class="text-gray-600">${entry.date.toLocaleDateString()}</span>
+                <span class="text-gray-500 sm:hidden">${entry.difficulty}</span>
+              </div>
+              <div class="flex justify-between sm:gap-4">
+                <span class="capitalize text-gray-600 hidden sm:inline">${entry.difficulty}</span>
+                <span class="font-medium">${entry.wpm} WPM</span>
+                <span class="font-medium">${entry.accuracy}%</span>
+                <span class="text-gray-500 hidden sm:inline">${entry.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+              </div>
             `;
             elements.historyEntries.appendChild(entryDiv);
           });
         } else {
-          elements.historyEntries.innerHTML = '<p class="text-gray-500 text-center">No attempts yet</p>';
+          elements.historyEntries.innerHTML = '<p class="text-gray-500 text-center py-4">No attempts yet</p>';
         }
       } else {
         elements.historyContainer.classList.add('hidden');
       }
+      
+      // Update pause button
+      if (state.isPaused) {
+        elements.pauseBtn.innerHTML = '<i data-lucide="play" class="w-4 h-4 sm:w-5 sm:h-5"></i> Resume';
+        elements.userInput.placeholder = "Test paused...";
+      } else {
+        elements.pauseBtn.innerHTML = '<i data-lucide="pause" class="w-4 h-4 sm:w-5 sm:h-5"></i> Pause';
+        elements.userInput.placeholder = state.isFinished ? "Test completed!" : "Start typing here...";
+      }
+      
+      // Refresh Lucide icons
+      lucide.createIcons();
+    }
+
+    function showCompletionModal() {
+      elements.completionWpm.textContent = `WPM: ${state.wpm}`;
+      elements.completionAccuracy.textContent = `Accuracy: ${state.accuracy}%`;
+      elements.completionModal.classList.remove('hidden');
+    }
+
+    function togglePause() {
+      if (state.isCountingDown || state.isFinished) return;
+      
+      state.isPaused = !state.isPaused;
+      
+      if (state.isPaused) {
+        state.pauseStartTime = Date.now();
+        elements.userInput.disabled = true;
+      } else {
+        state.totalPauseTime += Date.now() - state.pauseStartTime;
+        state.pauseStartTime = null;
+        elements.userInput.disabled = false;
+        elements.userInput.focus();
+      }
+      
+      updateUI();
+    }
+
+    function saveHistory() {
+      localStorage.setItem('typingHistory', JSON.stringify(state.history));
+    }
+
+    function clearHistory() {
+      state.history = [];
+      saveHistory();
+      updateUI();
     }
 
     // Event listeners
     elements.easyBtn.addEventListener('click', () => {
       state.difficulty = 'easy';
+      state.showCustomInput = false;
+      elements.customTextContainer.classList.add('hidden');
       resetGame();
     });
 
     elements.mediumBtn.addEventListener('click', () => {
       state.difficulty = 'medium';
+      state.showCustomInput = false;
+      elements.customTextContainer.classList.add('hidden');
       resetGame();
     });
 
     elements.hardBtn.addEventListener('click', () => {
       state.difficulty = 'hard';
+      state.showCustomInput = false;
+      elements.customTextContainer.classList.add('hidden');
       resetGame();
     });
 
@@ -354,6 +556,7 @@
       state.showCustomInput = !state.showCustomInput;
       if (state.showCustomInput) {
         elements.customTextContainer.classList.remove('hidden');
+        elements.customText.focus();
       } else {
         elements.customTextContainer.classList.add('hidden');
       }
@@ -362,12 +565,19 @@
     elements.useCustomTextBtn.addEventListener('click', () => {
       if (elements.customText.value.trim()) {
         state.customText = elements.customText.value.trim();
+        state.showCustomInput = false;
+        elements.customTextContainer.classList.add('hidden');
         resetGame();
       }
     });
 
+    elements.cancelCustomTextBtn.addEventListener('click', () => {
+      state.showCustomInput = false;
+      elements.customTextContainer.classList.add('hidden');
+    });
+
     elements.userInput.addEventListener('input', (e) => {
-      if (state.isCountingDown) return;
+      if (state.isCountingDown || state.isPaused) return;
       
       state.userInput = e.target.value;
 
@@ -377,63 +587,79 @@
         
         // Start timer for current time and instant WPM
         state.timerInterval = setInterval(() => {
-          const elapsed = Date.now() - state.startTime;
-          state.currentTime = Math.floor(elapsed / 1000);
-          
-          // Calculate instant WPM
-          const wordsTyped = state.userInput.trim().split(' ').length;
-          const minutesElapsed = elapsed / 60000;
-          state.instantWpm = Math.round(wordsTyped / minutesElapsed);
-          
-          updateUI();
-        }, 1000);
+          if (!state.isPaused) {
+            calculateStats();
+            updateUI();
+          }
+        }, 200);
       }
 
-      // Calculate mistakes
-      let mistakeCount = 0;
-      for (let i = 0; i < state.userInput.length; i++) {
-        if (state.userInput[i] !== state.currentText[i]) {
-          mistakeCount++;
-        }
-      }
-      state.mistakes = mistakeCount;
-
+      // Calculate stats
+      const { elapsed, minutesElapsed, correctChars } = calculateStats();
+      
       // Check if completed
       if (state.userInput.length === state.currentText.length) {
-        const endTimeNow = Date.now();
-        state.endTime = endTimeNow;
+        state.endTime = Date.now();
         state.isFinished = true;
         
-        // Calculate final stats
-        const timeInMinutes = (endTimeNow - (state.startTime || endTimeNow)) / 60000;
-        const wordsTyped = state.currentText.split(' ').length;
-        const currentWpm = Math.round(wordsTyped / timeInMinutes);
-        const currentAccuracy = Math.round(((state.currentText.length - mistakeCount) / state.currentText.length) * 100);
-        
-        state.wpm = currentWpm;
-        state.accuracy = currentAccuracy;
+        // Calculate final WPM
+        const wordsTyped = correctChars / 5;
+        state.wpm = minutesElapsed > 0 ? Math.round(wordsTyped / minutesElapsed) : 0;
         
         // Update best score
-        if (currentWpm > state.bestScore) {
-          state.bestScore = currentWpm;
+        if (state.wpm > state.bestScore) {
+          state.bestScore = state.wpm;
         }
 
         // Add to history
         state.history = [{
           date: new Date(),
-          wpm: currentWpm,
-          accuracy: currentAccuracy,
+          wpm: state.wpm,
+          accuracy: state.accuracy,
           difficulty: state.difficulty
         }, ...state.history].slice(0, 10);
+        
+        // Save to localStorage
+        saveHistory();
 
         // Clear timer
         clearInterval(state.timerInterval);
+        
+        // Show completion modal
+        setTimeout(showCompletionModal, 500);
+        
+        // Disable input
+        elements.userInput.disabled = true;
+        elements.pauseBtn.classList.add('hidden');
       }
 
       updateUI();
     });
 
     elements.resetBtn.addEventListener('click', resetGame);
+    
+    elements.pauseBtn.addEventListener('click', togglePause);
+    
+    elements.closeCompletionModal.addEventListener('click', () => {
+      elements.completionModal.classList.add('hidden');
+    });
+    
+    elements.clearHistoryBtn.addEventListener('click', clearHistory);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      // Escape key to close modals
+      if (e.key === 'Escape') {
+        if (!elements.completionModal.classList.contains('hidden')) {
+          elements.completionModal.classList.add('hidden');
+        }
+      }
+      
+      // Space + Ctrl to restart
+      if (e.key === ' ' && e.ctrlKey) {
+        resetGame();
+      }
+    });
 
     // Initialize the game
     resetGame();
